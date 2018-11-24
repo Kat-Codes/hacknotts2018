@@ -1,0 +1,42 @@
+﻿<Page
+    x:Class="DoorFace.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DoorFace"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    RequestedTheme="Dark" Loaded="Page_Loaded">
+
+    <Grid x:Name="MainGrid">
+        <Grid x:Name="InitialDisplayGrid" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="1" HorizontalAlignment="Center" Margin="100" FontSize="60" Text="Face recognition doorbell"/>
+            <TextBlock Grid.Row="2" HorizontalAlignment="Center" FontSize="40" Text="Press button to start"/>
+        </Grid>
+        <Grid x:Name="LookIntoCameraGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Margin="20" HorizontalAlignment="Center" TextAlignment="Center" FontSize="40" TextWrapping="WrapWholeWords" Text="Please align your face with the square below and press the button to take a picture"/>
+            <Grid x:Name="CameraPreviewGrid" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="8*"/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+                <CaptureElement Grid.Row="0" Grid.RowSpan="3" x:Name="CameraCaptureElement" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="50"/>
+                <Viewbox Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="20">
+                    <Border Width="200" Height="200" BorderBrush="Red" BorderThickness="1"/>
+                </Viewbox>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>
