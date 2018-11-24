@@ -1,23 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Graphics.Display;
 using Windows.Media.Capture;
+using Windows.Media.MediaProperties;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using Windows.System;
 using Windows.System.Display;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Media.Imaging;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -30,6 +26,7 @@ namespace DoorFace
     {
         MediaCapture mediaCapture;
         bool isPreviewing;
+        private DoorbellState currentState = DoorbellState.InitialScreen;
 
         DisplayRequest displayRequest = new DisplayRequest();
 
@@ -86,7 +83,61 @@ namespace DoorFace
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            CoreWindow.GetForCurrentThread().KeyUp += Page_KeyUp;
             await this.StartPreviewAsync();
         }
+
+        private void Page_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.VirtualKey == VirtualKey.Space)
+            {
+                GoToNextState(false);
+            }
+        }
+
+        async void GoToNextState(bool calledFromKeyPress, string data = null)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                switch (currentState)
+                {
+                    case DoorbellState.InitialScreen:
+                        this.InitialDisplayGrid.Visibility = Visibility.Collapsed;
+                        this.LookIntoCameraGrid.Visibility = Visibility.Visible;
+                        this.currentState = DoorbellState.TakingPicture;
+                        break;
+                    case DoorbellState.TakingPicture:
+                        this.LookIntoCameraGrid.Visibility = Visibility.Collapsed;
+                        this.VerifyingPersonGrid.Visibility = Visibility.Visible;
+                        await this.mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), ms.AsRandomAccessStream());
+                        ms.Position = 0;
+                        BitmapImage imagePreview = new BitmapImage();
+                        imagePreview.SetSource(ms.AsRandomAccessStream());
+                        this.VerifyingPreviewImage.Source = imagePreview;
+                        this.currentState = DoorbellState.VerifyingPicture;
+                        break;
+                    case DoorbellState.VerifyingPicture:
+                        if (calledFromKeyPress) return;
+                        this.VerificationCompleteStatusTextBlock.Text = String.IsNullOrWhiteSpace(data) ? "You are not a verified user. This incident will be reported." : $"Welcome, {data}!";
+                        this.VerifyingPersonGrid.Visibility = Visibility.Collapsed;
+                        this.VerificationCompleteGrid.Visibility = Visibility.Visible;
+                        this.currentState = DoorbellState.VerificationResponse;
+                        break;
+                    case DoorbellState.VerificationResponse:
+                        this.VerificationCompleteGrid.Visibility = Visibility.Collapsed;
+                        this.InitialDisplayGrid.Visibility = Visibility.Visible;
+                        this.currentState = DoorbellState.InitialScreen;
+                        break;
+                }
+            }
+        }
+    }
+
+    enum DoorbellState
+    {
+        InitialScreen,
+        TakingPicture,
+        VerifyingPicture,
+        VerificationResponse
     }
 }
