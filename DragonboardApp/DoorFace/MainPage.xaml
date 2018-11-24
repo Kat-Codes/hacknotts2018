@@ -10,7 +10,7 @@
     RequestedTheme="Dark" Loaded="Page_Loaded">
 
     <Grid x:Name="MainGrid">
-        <Grid x:Name="InitialDisplayGrid" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="Collapsed">
+        <Grid x:Name="InitialDisplayGrid" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition Height="Auto" />
@@ -20,7 +20,7 @@
             <TextBlock Grid.Row="1" HorizontalAlignment="Center" Margin="100" FontSize="60" Text="Face recognition doorbell"/>
             <TextBlock Grid.Row="2" HorizontalAlignment="Center" FontSize="40" Text="Press button to start"/>
         </Grid>
-        <Grid x:Name="LookIntoCameraGrid">
+        <Grid x:Name="LookIntoCameraGrid" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -32,11 +32,29 @@
                     <RowDefinition Height="8*"/>
                     <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
-                <CaptureElement Grid.Row="0" Grid.RowSpan="3" x:Name="CameraCaptureElement" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="50"/>
-                <Viewbox Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="20">
+                <CaptureElement Grid.Row="0" Grid.RowSpan="3" x:Name="CameraCaptureElement" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                <Viewbox Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0">
                     <Border Width="200" Height="200" BorderBrush="Red" BorderThickness="1"/>
                 </Viewbox>
             </Grid>
+        </Grid>
+        <Grid x:Name="VerifyingPersonGrid" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition  Height="8*"/>
+                <RowDefinition  Height="2*"/>
+                <RowDefinition  Height="*"/>
+                <RowDefinition  Height="2*"/>
+            </Grid.RowDefinitions>
+            <Viewbox Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <Image x:Name="VerifyingPreviewImage"/>
+            </Viewbox>
+            <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="60" Text="We're just verifying you, sit tight"/>
+            <Viewbox Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0">
+                <ProgressRing IsActive="True" Width="75" Height="75"/>
+            </Viewbox>
+        </Grid>
+        <Grid x:Name="VerificationCompleteGrid" Visibility="Collapsed">
+            <TextBlock x:Name="VerificationCompleteStatusTextBlock" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="60" Text="Verification text goes here"/>
         </Grid>
     </Grid>
 </Page>
