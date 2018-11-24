@@ -17,8 +17,8 @@ if __name__ == '__main__':
     except Exception as err:
         print("lol fail")
 
+def check_known()
+    return face_recognition --cpus 4 ./known_people/ ./Unknown_pictures/ cut -d ',' -f2
+    
 if __name__ == '__main__':
     app.run(debug=True)
-
-def check_known()
-    face_recognition --cpus 4 ./known_people/ ./Unknown_pictures/
