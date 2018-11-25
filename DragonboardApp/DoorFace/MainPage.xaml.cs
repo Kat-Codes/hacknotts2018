@@ -41,22 +41,9 @@ namespace DoorFace
         {
             try
             {
-
                 mediaCapture = new MediaCapture();
                 await mediaCapture.InitializeAsync();
 
-                displayRequest.RequestActive();
-                CameraCaptureElement.Stretch = Stretch.UniformToFill;
-            }
-            catch (UnauthorizedAccessException uae)
-            {
-                // This will be thrown if the user denied access to the camera in privacy settings
-                await new MessageDialog("The app was denied access to the camera").ShowAsync();
-                return;
-            }
-
-            try
-            {
                 CameraCaptureElement.Source = mediaCapture;
                 await mediaCapture.StartPreviewAsync();
                 isPreviewing = true;
@@ -65,7 +52,12 @@ namespace DoorFace
             {
                 mediaCapture.CaptureDeviceExclusiveControlStatusChanged += MediaCaptureOnCaptureDeviceExclusiveControlStatusChanged;
             }
-
+            catch (UnauthorizedAccessException uae)
+            {
+                // This will be thrown if the user denied access to the camera in privacy settings
+                await new MessageDialog("The app was denied access to the camera").ShowAsync();
+                return;
+            }
         }
 
         private async void MediaCaptureOnCaptureDeviceExclusiveControlStatusChanged(MediaCapture sender, MediaCaptureDeviceExclusiveControlStatusChangedEventArgs args)
@@ -86,12 +78,20 @@ namespace DoorFace
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             CoreWindow.GetForCurrentThread().KeyUp += Page_KeyUp;
-            //var controller = GpioController.GetDefault();
-            //GpioPin pin;
-            //GpioOpenStatus openStatus;
-            //controller.TryOpenPin(36, GpioSharingMode.SharedReadOnly, out pin, out openStatus);
+            var controller = GpioController.GetDefault();
+            GpioPin pin;
+            GpioOpenStatus openStatus;
+            controller.TryOpenPin(36, GpioSharingMode.SharedReadOnly, out pin, out openStatus);
             //pin.SetDriveMode(GpioPinDriveMode.Input);
-            //pin.ValueChanged += (gpioPin, args) => { GoToNextState(true); };
+            pin.ValueChanged += async (gpioPin, args) =>
+            {
+                if (args.Edge == GpioPinEdge.RisingEdge)
+                {
+                    await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => GoToNextState(true));
+                }
+            };
+
+            await this.StartPreviewAsync();
         }
 
         private void Page_KeyUp(object sender, KeyEventArgs e)
@@ -109,7 +109,6 @@ namespace DoorFace
                 switch (currentState)
                 {
                     case DoorbellState.InitialScreen:
-                        await this.StartPreviewAsync();
                         this.InitialDisplayGrid.Visibility = Visibility.Collapsed;
                         this.LookIntoCameraGrid.Visibility = Visibility.Visible;
                         this.currentState = DoorbellState.TakingPicture;

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10" IgnorableNamespaces="uap mp iot">
   <Identity Name="d4832c78-82aa-45af-85e7-826056190e46" Publisher="CN=Anthony" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="d4832c78-82aa-45af-85e7-826056190e46" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
@@ -24,7 +24,13 @@
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
+    <iot:Capability Name="lowLevelDevices" />
+    <uap:Capability Name="removableStorage" />
+    <iot:Capability Name="systemManagement" />
+    <uap:Capability Name="videosLibrary" />
+    <uap:Capability Name="voipCall" />
     <DeviceCapability Name="webcam" />
     <DeviceCapability Name="microphone" />
+    <DeviceCapability Name="lowLevel" />
   </Capabilities>
 </Package>

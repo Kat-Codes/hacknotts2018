@@ -32,7 +32,7 @@
                     <RowDefinition Height="8*"/>
                     <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
-                <CaptureElement Grid.Row="0" Grid.RowSpan="3" x:Name="CameraCaptureElement" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                <CaptureElement Grid.Row="0" Grid.RowSpan="3" x:Name="CameraCaptureElement" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Stretch="UniformToFill"/>
                 <Viewbox Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0">
                     <Border Width="200" Height="200" BorderBrush="Red" BorderThickness="1"/>
                 </Viewbox>
