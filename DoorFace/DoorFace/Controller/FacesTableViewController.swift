@@ -117,16 +117,17 @@ class FacesTableViewController: UITableViewController {
     
     func postFace(faceImage : UIImage, name : String) {
         //TODO: post a face to the database
-        let image = faceImage
+        var image = faceImage
+        image = resizeImage(image: image, targetSize: CGSize(width: 512, height: 512))
         let imgData = image.jpegData(compressionQuality: 0.2)
         
-        let parameters = ["name": name] //Optional for extra parameter
+        //let parameters = ["name": name] //Optional for extra parameter
         
         Alamofire.upload(multipartFormData: { multipartFormData in
             multipartFormData.append(imgData!, withName: "imagefile",fileName: (String)(name + ".jpg"), mimeType: "image/jpg")
-            for (key, value) in parameters {
-                multipartFormData.append(value.data(using: String.Encoding.utf8)!, withName: key)
-            } //Optional for extra parameters
+//            for (key, value) in parameters {
+//                multipartFormData.append(value.data(using: String.Encoding.utf8)!, withName: key)
+//            } //Optional for extra parameters
         },
                          to:"http://35.189.65.39/uploadToContacts")
         { (result) in
@@ -145,6 +146,32 @@ class FacesTableViewController: UITableViewController {
                 print(encodingError)
             }
         }
+    }
+    
+    func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
+        let size = image.size
+        
+        let widthRatio  = targetSize.width  / size.width
+        let heightRatio = targetSize.height / size.height
+        
+        // Figure out what our orientation is, and use that to form the rectangle
+        var newSize: CGSize
+        if(widthRatio > heightRatio) {
+            newSize = CGSize(width: size.width * heightRatio, height: size.height * heightRatio)
+        } else {
+            newSize = CGSize(width: size.width * widthRatio,  height: size.height * widthRatio)
+        }
+        
+        // This is the rect that we've calculated out and this is what is actually used below
+        let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
+        
+        // Actually do the resizing to the rect using the ImageContext stuff
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+        image.draw(in: rect)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return newImage!
     }
     
     
