@@ -23,7 +23,10 @@ class FacesTableViewController: UITableViewController {
         facesArray.append(face1!)
         facesArray.append(face2!)
         facesArray.append(face3!)
-        loadFace(faceImageUrl: "http://35.189.65.39/known_people/Obama.jpg", name: "Obama")
+        loadFace(faceImageUrl: "http://35.189.65.39/Known_people/Obama.jpg", name: "Obama")
+
+        loadFace(faceImageUrl: "http://35.189.65.39/Known_people/Anthony%20Roberts.jpg", name: "Anthony Roberts")
+        loadFace(faceImageUrl: "http://35.189.65.39/Known_people/Hamish%20Sams.jpg", name: "Hamish Sams")
         
         tableView.register(UINib(nibName: "FaceCell", bundle: nil), forCellReuseIdentifier: "faceCell")
         tableView.rowHeight = 70

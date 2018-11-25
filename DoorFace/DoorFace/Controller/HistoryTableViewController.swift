@@ -28,11 +28,12 @@ class HistoryTableViewController: UITableViewController, UITabBarControllerDeleg
         let entr2 = HistoryEntry()
         let entr3 = HistoryEntry()
         entr1.photo = UIImage(named: "sample1")
-        entr1.date -= 300
+        entr1.date -= 7200
         entr2.photo = UIImage(named: "sample2")
         entr2.messageBody = "ALERT: Unrecognised face!"
-        entr2.date -= 100
+        entr2.date -= 6500
         entr3.photo = UIImage(named: "sample3")
+        entr3.date -= 4000
         entr3.messageBody = "Welcome home ;););)"
         entriesArray.append(entr1)
         entriesArray.append(entr2)
