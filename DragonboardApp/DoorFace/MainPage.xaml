@@ -54,7 +54,7 @@
             </Viewbox>
         </Grid>
         <Grid x:Name="VerificationCompleteGrid" Visibility="Collapsed">
-            <TextBlock x:Name="VerificationCompleteStatusTextBlock" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="60" Text="Verification text goes here"/>
+            <TextBlock x:Name="VerificationCompleteStatusTextBlock" TextWrapping="WrapWholeWords" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="60" Text="Verification text goes here"/>
         </Grid>
     </Grid>
 </Page>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.Devices.Gpio;
 using Windows.Media.Capture;
@@ -29,6 +30,7 @@ namespace DoorFace
         MediaCapture mediaCapture;
         bool isPreviewing;
         private DoorbellState currentState = DoorbellState.InitialScreen;
+        private HttpClient client = new HttpClient();
 
         DisplayRequest displayRequest = new DisplayRequest();
 
@@ -82,16 +84,22 @@ namespace DoorFace
             GpioPin pin;
             GpioOpenStatus openStatus;
             controller.TryOpenPin(36, GpioSharingMode.SharedReadOnly, out pin, out openStatus);
+            pin.DebounceTimeout = TimeSpan.FromMilliseconds(250);
             //pin.SetDriveMode(GpioPinDriveMode.Input);
             pin.ValueChanged += async (gpioPin, args) =>
             {
                 if (args.Edge == GpioPinEdge.RisingEdge)
                 {
-                    await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => GoToNextState(true));
+                    Task.Run(() => FireAndForgetNextStateDispatcher());
                 }
             };
 
             await this.StartPreviewAsync();
+        }
+
+        private async void FireAndForgetNextStateDispatcher()
+        {
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => GoToNextState(true));
         }
 
         private void Page_KeyUp(object sender, KeyEventArgs e)
@@ -105,6 +113,7 @@ namespace DoorFace
         async void GoToNextState(bool calledFromKeyPress, string data = null)
         {
             using (MemoryStream ms = new MemoryStream())
+            using (MemoryStream ms2 = new MemoryStream())
             {
                 switch (currentState)
                 {
@@ -118,10 +127,14 @@ namespace DoorFace
                         this.VerifyingPersonGrid.Visibility = Visibility.Visible;
                         await this.mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), ms.AsRandomAccessStream());
                         ms.Position = 0;
+                        ms.CopyTo(ms2);
+                        ms.Position = 0;
+                        ms2.Position = 0;
                         BitmapImage imagePreview = new BitmapImage();
                         imagePreview.SetSource(ms.AsRandomAccessStream());
                         this.VerifyingPreviewImage.Source = imagePreview;
                         this.currentState = DoorbellState.VerifyingPicture;
+                        SendImageAndGetResponse(ms2);
                         break;
                     case DoorbellState.VerifyingPicture:
                         if (calledFromKeyPress) return;
@@ -129,6 +142,8 @@ namespace DoorFace
                         this.VerifyingPersonGrid.Visibility = Visibility.Collapsed;
                         this.VerificationCompleteGrid.Visibility = Visibility.Visible;
                         this.currentState = DoorbellState.VerificationResponse;
+                        await Task.Delay(5000);
+                        Application.Current.Exit();
                         break;
                     case DoorbellState.VerificationResponse:
                         this.VerificationCompleteGrid.Visibility = Visibility.Collapsed;
@@ -136,6 +151,30 @@ namespace DoorFace
                         this.currentState = DoorbellState.InitialScreen;
                         break;
                 }
+            }
+        }
+
+        public async void SendImageAndGetResponse(MemoryStream ms)
+        {
+            try
+            {
+                MultipartFormDataContent formContent = new MultipartFormDataContent();
+                formContent.Add(new ByteArrayContent(ms.ToArray()), "file", "upload.jpg");
+
+                var response = client.PostAsync("http://35.189.65.39/uploadForCheck", formContent);
+
+                var responseString = await response.Result.Content.ReadAsStringAsync();
+
+                string responseToGetCheck = await client.GetStringAsync("http://35.189.65.39/check");
+
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    () => { GoToNextState(false, responseToGetCheck); });
+            }
+            catch (Exception ex)
+            {
+                Debugger.Break();
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    () => { GoToNextState(false, null); });
             }
         }
     }
