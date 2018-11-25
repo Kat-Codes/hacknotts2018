@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Windows.Devices.Gpio;
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
 using Windows.Storage;
@@ -84,14 +86,19 @@ namespace DoorFace
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             CoreWindow.GetForCurrentThread().KeyUp += Page_KeyUp;
-            await this.StartPreviewAsync();
+            //var controller = GpioController.GetDefault();
+            //GpioPin pin;
+            //GpioOpenStatus openStatus;
+            //controller.TryOpenPin(36, GpioSharingMode.SharedReadOnly, out pin, out openStatus);
+            //pin.SetDriveMode(GpioPinDriveMode.Input);
+            //pin.ValueChanged += (gpioPin, args) => { GoToNextState(true); };
         }
 
         private void Page_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.VirtualKey == VirtualKey.Space)
             {
-                GoToNextState(false);
+                GoToNextState(true);
             }
         }
 
@@ -102,6 +109,7 @@ namespace DoorFace
                 switch (currentState)
                 {
                     case DoorbellState.InitialScreen:
+                        await this.StartPreviewAsync();
                         this.InitialDisplayGrid.Visibility = Visibility.Collapsed;
                         this.LookIntoCameraGrid.Visibility = Visibility.Visible;
                         this.currentState = DoorbellState.TakingPicture;
