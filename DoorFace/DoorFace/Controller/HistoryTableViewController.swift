@@ -17,6 +17,8 @@ class HistoryTableViewController: UITableViewController, UITabBarControllerDeleg
     var entriesArray = [HistoryEntry]()
     var timer = Timer()
     
+    var cameraImage = UIImage(named: "cameraPlaceholder")
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tabBarController?.delegate = self
@@ -97,10 +99,13 @@ class HistoryTableViewController: UITableViewController, UITabBarControllerDeleg
                 return
             }
             // Do stuff with your image
-            let httpEntry = HistoryEntry()
-            httpEntry.photo = image
-            httpEntry.messageBody = name + " is here!"
-            self.addNewEntry(entry: httpEntry)
+            if !self.compareImage(image1: self.cameraImage!, isEqualTo: image) {
+                let httpEntry = HistoryEntry()
+                httpEntry.photo = image
+                httpEntry.messageBody = name + " is here!"
+                self.addNewEntry(entry: httpEntry)
+            }
+            self.cameraImage = image
         }
     }
     
@@ -110,7 +115,7 @@ class HistoryTableViewController: UITableViewController, UITabBarControllerDeleg
     
     func scheduledTimerWithTimeInterval(){
         // Scheduling timer to Call the function "updateCounting" with the interval of 1 seconds
-        timer = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(self.updateCounting), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(self.updateCounting), userInfo: nil, repeats: true)
     }
     
     @objc func updateCounting(){
@@ -123,6 +128,12 @@ class HistoryTableViewController: UITableViewController, UITabBarControllerDeleg
                 self.loadEntry(imageUrl: "http://35.189.65.39/Unknown_pictures/face.jpg", name: result)
             }
         }
+    }
+    
+    func compareImage(image1: UIImage, isEqualTo image2: UIImage) -> Bool {
+        let data1: NSData = image1.pngData()! as NSData
+        let data2: NSData = image2.pngData()! as NSData
+        return data1.isEqual(data2)
     }
     
 }
