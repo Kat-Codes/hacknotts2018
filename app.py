@@ -1,6 +1,8 @@
+import face_recognition
 from flask import Flask, render_template, request
 import os
 import os
+
 
 from os import listdir
 from os.path import isfile, join
@@ -28,8 +30,9 @@ def upload():
 def check():
     try:
         imagefile = request.files['file']
-        imagefile.save(os.path.join('./Unknown_pictures', imagefile.filename))
+        imagefile.save('Unknown_pictures/test2.jpg')
         check_known(imagefile.filename)
+        
         os.remove('./Unknown_pictures/' +imagefile.filename)
         return "success"
     except Exception as err:
@@ -38,18 +41,21 @@ def check():
 
 def check_known(aFILE):
     j=0
-    mypath = "Known_faces"
-    mypath2 = "Unknown_pictures"
+    mypath = "Known_people"
+    mypath2 = "Unknown_pictures/"
     onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
     for i in onlyfiles:
+        #print(i)
         if(i.endswith('.jpg')):
             picture_of_me = face_recognition.load_image_file(mypath +"/" +i)
             my_face_encoding = face_recognition.face_encodings(picture_of_me)[0]
 
-            unknown_picture = face_recognition.load_image_file(mypath2 + aFILE)
+            #wait for image to be loaded
+            unknown_picture = face_recognition.load_image_file("Unknown_pictures/test2.jpg")
             unknown_face_encoding = face_recognition.face_encodings(unknown_picture)[0]
             results = face_recognition.compare_faces([my_face_encoding], unknown_face_encoding)
             if results[0] == True:
+                print(os.path.splitext(i))
                 print("It's a picture of " +os.path.splitext(i)[0])
                 j=1
 
