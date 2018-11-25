@@ -1,3 +1,4 @@
 Flask
 Werkzeug
-Face_recognition
+face_recognition
+dlib

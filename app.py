@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request
-
 import os
+import os
+
+from os import listdir
+from os.path import isfile, join
 
 app = Flask(__name__)
 
@@ -26,13 +29,12 @@ def check():
     try:
         imagefile = request.files['file']
         imagefile.save(os.path.join('./Unknown_pictures', imagefile.filename))
-        # check_known()
+        check_known(imagefile.filename)
         os.remove('./Unknown_pictures/' +imagefile.filename)
         return "success"
     except Exception as err:
         print(err)
         return "fail"
 
-# def check_known():
-#     os.system(face_recognition ./known_people/ ./Unknown_pictures/ cut -d ',' -f2)
-#     return
+def check_known(aFILE):
+    
